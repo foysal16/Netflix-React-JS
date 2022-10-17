@@ -1,7 +1,26 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserAuth } from "../context/AuthContext";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { user, logIn } = UserAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      await logIn(email, password);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      setError(error.message);
+    }
+  };
+
   return (
     <>
       <div className="w-full h-[880px]">
@@ -16,14 +35,20 @@ export default function Login() {
           <div className="max-w-[450px]  h-[600px] mx-auto rounded-md bg-black/75 text-white">
             <div className="max-w-[310px] mx-auto py-16">
               <h1 className="text-3xl font-bold">Sign In</h1>
-              <form className="w-full flex flex-col py-4">
+              {error ? <p className="p-3 bg-red-600 my-2">{error}</p> : null}
+              <form
+                onSubmit={handleSubmit}
+                className="w-full flex flex-col py-4"
+              >
                 <input
+                  onChange={(e) => setEmail(e.target.value)}
                   className="p-3 my-2 bg-gray-700 rounded"
                   type="email"
                   placeholder="Email"
                   autoComplete="email"
                 />
                 <input
+                  onChange={(e) => setPassword(e.target.value)}
                   className="p-3 my-2 bg-gray-700 rounded"
                   type="password"
                   placeholder="Password"
@@ -41,9 +66,7 @@ export default function Login() {
                   <p>Need Help?</p>
                 </div>
                 <p className="py-10 text-sm">
-                  <span className="text-gray-400">
-                    Already Subscribed to NetFlix?
-                  </span>{" "}
+                  <span className="text-gray-400">New to NetFlix?</span>{" "}
                   <Link to="/singUp">Sing Up</Link>
                 </p>
               </form>
